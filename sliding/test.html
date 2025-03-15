@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPTCHA Puzzle Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .captcha-container {
+            position: relative;
+            margin: 20px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .captcha-image {
+            display: block;
+            max-width: 100%;
+        }
+        
+        .puzzle-piece {
+            position: absolute;
+            left: 0;
+            top: 0px; /* y_pos */
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .slider-container {
+            width: 100%;
+            padding: 20px 0;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 15px;
+            border-radius: 10px;
+            background: #d3d3d3;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+        
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>CAPTCHA Puzzle Verification</h1>
+    
+    <div class="captcha-container">
+        <img src="" alt="CAPTCHA image" class="captcha-image" id="captcha-image">
+        <img src="" alt="Puzzle piece" class="puzzle-piece" id="puzzle-piece">
+    </div>
+    
+    <div class="slider-container">
+        <p>Drag the slider to position the puzzle piece</p>
+        <input type="range" min="0" max="100" value="0" class="slider" id="position-slider">
+    </div>
+    
+    <div id="success-message" class="status-message success hidden">
+        Verification successful! ✓
+    </div>
+    
+    <div id="error-message" class="status-message error hidden">
+        Incorrect position. Please try again.
+    </div>
+    
+    <script>
+        const puzzlePiece = document.getElementById('puzzle-piece');
+        const slider = document.getElementById('position-slider');
+        const captchaImage = document.getElementById('captcha-image');
+        const successMessage = document.getElementById('success-message');
+        const errorMessage = document.getElementById('error-message');
+
+        const correctX = 0;
+        const tolerance = 15;
+        
+        let maxPosition = 0;
+        
+        window.onload = function() {
+            maxPosition = captchaImage.width - puzzlePiece.width;
+            slider.max = maxPosition;
+            
+            updatePuzzlePosition(0);
+        };
+        
+        slider.oninput = function() {
+            updatePuzzlePosition(this.value);
+            
+            successMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+        };
+        
+        slider.onchange = function() {
+            validatePosition(this.value);
+        };
+        
+        function updatePuzzlePosition(xPos) {
+            puzzlePiece.style.left = xPos + 'px';
+        }
+        
+        function validatePosition(currentPosition) {
+            const diff = Math.abs(currentPosition - correctX);
+            
+            if (diff <= tolerance) {
+                successMessage.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+                
+                console.log('Verification successful!');
+            } else {
+                successMessage.classList.add('hidden');
+                errorMessage.classList.remove('hidden');
+                console.log('Verification failed. Difference: ' + diff + 'px');
+            }
+        }
+    </script>
+</body>
+</html>
